@@ -1,0 +1,6 @@
+coverage
+pylama
+pytest
+pytest-aiohttp
+pytest-cov
+sqlalchemy_utils

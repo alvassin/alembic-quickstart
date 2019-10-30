@@ -1,0 +1,14 @@
+version: '2.4'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:latest
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: staff
+      POSTGRES_PASS: hackme
+      POSTGRES_DB: staff
