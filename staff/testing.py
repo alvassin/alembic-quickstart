@@ -10,8 +10,17 @@ from alembic.script import ScriptDirectory
 
 MODULE_PATH = os.path.dirname(__file__)
 
+# Represents migration with data to be tested and callbacks that perform
+# validation. See tests/data_migrations folder for details.
+MigrationValidationParamsGroup = namedtuple('MigrationData', [
+    'rev_base', 'rev_head', 'on_init', 'on_upgrade', 'on_downgrade'
+])
+
 
 def get_alembic_config(db_url: str) -> Config:
+    """
+    Provides Python object, representing alembic.ini file.
+    """
     cmd_options = SimpleNamespace(
         config=os.path.join(MODULE_PATH, 'alembic.ini'),
         db_url=db_url, name='alembic', raiseerr=False,
@@ -28,17 +37,18 @@ def get_alembic_config(db_url: str) -> Config:
 
 
 def get_revisions(db_url):
+    """
+    Get all available alembic migrations.
+    """
     revisions_dir = ScriptDirectory.from_config(get_alembic_config(db_url))
     for revision in revisions_dir.walk_revisions('base', 'heads'):
         yield revision
 
 
-MigrationValidationParamsGroup = namedtuple('MigrationData', [
-    'rev_base', 'rev_head', 'on_init', 'on_upgrade', 'on_downgrade'
-])
-
-
 def load_migration_as_module(file: str) -> ModuleType:
+    """
+    Allows to import alembic migration as a module.
+    """
     return importlib.machinery.SourceFileLoader(
         file,
         os.path.join(MODULE_PATH, 'alembic', 'versions', file)
@@ -48,7 +58,6 @@ def load_migration_as_module(file: str) -> ModuleType:
 def make_validation_params_groups(
     *migrations: ModuleType
 ) -> List[MigrationValidationParamsGroup]:
-
     data = []
     for migration in migrations:
 

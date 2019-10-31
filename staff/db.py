@@ -1,8 +1,9 @@
 """
-Утилита для управления базой данных.
+Alembic wrapper. Utility to manage database.
+Unlike alembic command is available anywhere and can work in any folder.
 
-В отличие от оригинального alembic доступна и работает из любой папки,
-принимает параметр --db-url (или переменную окружения STAFF_DB_URL)
+Accepts --db-url argument (or STAFF_DB_URL env variable), that is used instead
+of sqlalchemy.url option in alembic.ini
 """
 import logging
 import os

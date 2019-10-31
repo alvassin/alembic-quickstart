@@ -15,8 +15,10 @@ DB_URL = os.getenv('CI_STAFF_DB_URL',
 @pytest.fixture
 def temp_db() -> str:
     """
-    Создает временную базу данных для теста и потом удаляет ее, отключая всех
-    клиентов (если по какой-то причине не все отключились)
+    Creates temporary database for each test and then drops it.
+
+    If there are connected clients when test is finished -
+    disconnects them before dropping table.
     """
     tmp_db_name = '.'.join([uuid.uuid4().hex, 'pytest'])
     tmp_db_url = str(URL(DB_URL).with_path(tmp_db_name))
@@ -30,6 +32,9 @@ def temp_db() -> str:
 
 @pytest.fixture()
 def temp_db_engine(temp_db) -> Engine:
+    """
+    Engine, tied to temporary database.
+    """
     engine = create_engine(temp_db, echo=True)
     try:
         yield engine

@@ -25,11 +25,17 @@ def test_data_migrations(
     """
     config = get_alembic_config(str(temp_db_engine.url))
 
+    # Upgrade to previous migration and add some data, that should be changed
+    # by tested migration.
     upgrade(config, rev_base)
     on_init(engine=temp_db_engine)
 
+    # Perform upgrade in tested migration.
+    # Check that data was migrated correctly in on_upgrade callback
     upgrade(config, rev_head)
     on_upgrade(engine=temp_db_engine)
 
+    # Perform downgrade in tested migration.
+    # Check that changes were reverted back using on_downgrade callback
     downgrade(config, rev_base)
     on_downgrade(engine=temp_db_engine)
