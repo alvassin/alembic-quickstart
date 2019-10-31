@@ -1,5 +1,6 @@
 aiohttp
 asyncpgsa
 alembic
+configargparse
 psycopg2-binary
 sqlalchemy
