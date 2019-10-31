@@ -12,7 +12,8 @@ There is small project called "staff" with a couple of migrations and tiny
 aiohttp server.
 
 To start using project execute ``make devenv``. It would create virtual
-environment in env/ folder and install all dependencies.
+environment in env/ folder and install all dependencies (to see all available
+commands call ``make``).
 
 Project provides two utilities: ``staff-api`` (aiohttp server) and ``staff-db``
 (alembic wrapper, tool for database management).
