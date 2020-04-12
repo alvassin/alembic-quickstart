@@ -5,49 +5,33 @@ Unlike alembic command is available anywhere and can work in any folder.
 Accepts --db-url argument (or STAFF_DB_URL env variable), that is used instead
 of sqlalchemy.url option in alembic.ini
 """
+import argparse
 import logging
 import os
 
-from alembic.config import CommandLine, Config
+from alembic.config import CommandLine
 
-
-MODULE_PATH = os.path.dirname(__file__)
+from staff.utils import DEFAULT_PG_URL, make_alembic_config
 
 
 def main():
-    current_dir = os.path.abspath(os.getcwd())
+    logging.basicConfig(level=logging.DEBUG)
 
-    try:
-        logging.basicConfig(level=logging.DEBUG)
-        alembic = CommandLine()
-        alembic.parser.add_argument(
-            '--db-url', default=os.getenv('STAFF_DB_URL'),
-            help='Database URL [env: STAFF_DB_URL]'
-        )
+    alembic = CommandLine()
+    alembic.parser.formatter_class = argparse.ArgumentDefaultsHelpFormatter
+    alembic.parser.add_argument(
+        '--pg-url', default=os.getenv('STAFF_PG_URL', DEFAULT_PG_URL),
+        help='PostgreSQL URL [env: STAFF_PG_URL]'
+    )
 
-        options = alembic.parser.parse_args()
+    options = alembic.parser.parse_args()
+    if 'cmd' not in options:
+        alembic.parser.error('too few arguments')
+        exit(128)
+    else:
+        config = make_alembic_config(options)
+        exit(alembic.run_cmd(config, options))
 
-        if not options.db_url:
-            alembic.parser.error('--db-url is required')
-            exit(127)
 
-        if options.config == 'alembic.ini':
-            options.config = os.path.join(MODULE_PATH, options.config)
-
-        cfg = Config(
-            file_=options.config,
-            ini_section=options.name,
-            cmd_opts=options
-        )
-
-        cfg.set_main_option('script_location',
-                            str(os.path.join(MODULE_PATH, 'alembic')))
-        cfg.set_main_option('sqlalchemy.url', options.db_url)
-
-        if 'cmd' not in options:
-            alembic.parser.error('please specify command')
-            exit(128)
-        else:
-            exit(alembic.run_cmd(cfg, options))
-    finally:
-        os.chdir(current_dir)
+if __name__ == '__main__':
+    main()

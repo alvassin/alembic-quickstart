@@ -1,64 +1,56 @@
 import os
 from importlib.machinery import SourceFileLoader
 
-from setuptools import setup, find_packages
+from pkg_resources import parse_requirements
+from setuptools import find_packages, setup
 
 
-MODULE_NAME = 'staff'
-
+module_name = 'staff'
 module = SourceFileLoader(
-    MODULE_NAME,
-    os.path.join(MODULE_NAME, '__init__.py')
+    module_name, os.path.join(module_name, '__init__.py')
 ).load_module()
 
 
-def load_requirements(file: str):
-    """
-    Load requirements from specified file.
-    """
-    with open(file, 'r') as f:
-        for line in map(str.strip, f):
-            if line.startswith('#'):
-                continue
-            if line.startswith('-r '):
-                yield from load_requirements(line[3:])
-            else:
-                yield line
+def load_requirements(fname: str) -> list:
+    requirements = []
+    with open(fname, 'r') as fp:
+        for req in parse_requirements(fp.read()):
+            extras = '[{}]'.format(','.join(req.extras)) if req.extras else ''
+            requirements.append(
+                '{}{}{}'.format(req.name, extras, req.specifier)
+            )
+    return requirements
 
 
 setup(
-    name=MODULE_NAME,
+    name=module_name,
     version=module.__version__,
     author=module.__author__,
     author_email=module.__email__,
     license=module.__license__,
     description=module.__doc__,
-    long_description=open('README.rst').read(),
-    platforms="all",
+    long_description=open('README.md').read(),
+    url='https://github.com/alvassin/alembic-quickstart',
+    platforms='all',
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
+        'Natural Language :: Russian',
         'Operating System :: MacOS',
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Software Development',
     ],
+    python_requires=">3.5.*, <4",
+    packages=find_packages(exclude=['tests']),
+    install_requires=load_requirements('requirements.txt'),
+    extras_require={'dev': load_requirements('requirements.dev.txt')},
     entry_points={
         'console_scripts': [
-            'staff-api = staff.main:main',
-            'staff-db = staff.db:main'
+            '{0}-api = {0}.main:main'.format(module_name),
+            '{0}-db = {0}.db:main'.format(module_name)
         ]
     },
-    packages=find_packages(exclude=['tests']),
-    package_data={
-        MODULE_NAME: ['alembic.ini']
-    },
-    install_requires=load_requirements('requirements.txt'),
-    python_requires=">3.5.*, <4",
-    extras_require={
-        'dev': load_requirements('requirements.dev.txt'),
-    },
-    url='https://github.com/alvassin/alembic-quickstart'
+    include_package_data=True
 )

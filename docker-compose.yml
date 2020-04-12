@@ -9,6 +9,6 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: staff
-      POSTGRES_PASS: hackme
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: hackme
       POSTGRES_DB: staff

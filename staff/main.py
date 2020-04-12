@@ -3,11 +3,14 @@ from functools import partial
 from aiohttp.web import Application, run_app
 from aiohttp.web_exceptions import HTTPBadRequest
 from aiohttp.web_response import json_response
+from asyncpg import NotNullViolationError
 from asyncpgsa import PG
 from configargparse import ArgumentParser
 from yarl import URL
 
 from staff.schema import users_table
+from staff.utils import DEFAULT_PG_URL
+
 
 # ConfigArgParse allows to use env variables in addition to arguments.
 # E.g. you may configure your server using STAFF_HOST, STAFF_PORT, STAFF_DB_URL
@@ -17,22 +20,25 @@ parser.add_argument('--host', type=str, default='127.0.0.1',
                     help='Host to listen')
 parser.add_argument('--port', type=int, default=8080,
                     help='Port to listen')
-parser.add_argument(f'--db-url', type=URL,
-                    default=URL('postgresql://staff:hackme@0.0.0.0/staff'),
-                    help='URL to use to connect to the database')
+parser.add_argument('--pg-url', type=URL, default=URL(DEFAULT_PG_URL),
+                    help='URL to use to connect to the postgres database')
 
 
-async def init_pg(app, db_url):
+async def init_pg(app, pg_url):
     """
     Init asyncpgsa driver (asyncpg + sqlalchemy)
     """
     app['pg'] = PG()
-    await app['pg'].init(db_url)
+    await app['pg'].init(pg_url)
+    try:
+        yield
+    finally:
+        app['pg'].pool.close()
 
 
 async def handle_get_users(request):
     """
-    Return existing users
+    Handler, returns existing users
     """
     rows = await request.app['pg'].fetch(users_table.select())
     return json_response([dict(row) for row in rows])
@@ -40,20 +46,22 @@ async def handle_get_users(request):
 
 async def handle_create_user(request):
     """
-    Create new user
+    Handler, creates new user
     """
     data = await request.json()
-    if 'email' not in data:
+
+    try:
+        query = users_table.insert().values(
+            email=data['email'],
+            name=data.get('name'),
+            gender=data.get('gender'),
+            floor=data.get('floor'),
+            seat=data.get('seat')
+        ).returning(users_table)
+        row = await request.app['pg'].fetchrow(query)
+        return json_response(dict(row))
+    except NotNullViolationError:
         raise HTTPBadRequest()
-
-    query = users_table.insert().values(
-        email=data['email'],
-        name=data.get('name'),
-        surname=data.get('surname')
-    ).returning(users_table)
-
-    row = await request.app['pg'].fetchrow(query)
-    return json_response(dict(row))
 
 
 def main():
@@ -66,7 +74,11 @@ def main():
     app = Application()
     app.router.add_route('GET', '/users', handle_get_users)
     app.router.add_route('POST', '/users', handle_create_user)
-    app.on_startup.append(
-        partial(init_pg, db_url=str(args.db_url))
+    app.cleanup_ctx.append(
+        partial(init_pg, pg_url=str(args.pg_url))
     )
     run_app(app, host=args.host, port=args.port)
+
+
+if __name__ == '__main__':
+    main()

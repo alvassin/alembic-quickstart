@@ -6,12 +6,12 @@ You may do changes in tables here, then execute
 and alembic would generate new migration for you
 in staff/alembic/versions folder.
 """
-import sqlalchemy
-from sqlalchemy import Table, Column, Integer, String
+import enum
 
+from sqlalchemy import (
+    Column, Enum, Integer, MetaData, SmallInteger, String, Table
+)
 
-# For correct sorting in russian strings
-RU_COLLATION = 'ru-RU-x-icu'
 
 # Default naming convention for all indexes and constraints
 # See why this is important and how it would save your time:
@@ -30,15 +30,22 @@ convention = {
     'pk': 'pk__%(table_name)s'
 }
 
-# Registry for all your tables
-metadata = sqlalchemy.MetaData(naming_convention=convention)
+# Registry for all tables
+metadata = MetaData(naming_convention=convention)
 
-# Your table, that is being used in project
+
+class Gender(enum.Enum):
+    female = 'female'
+    male = 'male'
+
+
 users_table = Table(
     'users',
     metadata,
     Column('user_id', Integer, primary_key=True),
     Column('email', String(256), nullable=False, unique=True),
-    Column('name', String(256, collation=RU_COLLATION), nullable=True),
-    Column('surname', String(256, collation=RU_COLLATION), nullable=True)
+    Column('name', String(collation='ru-RU-x-icu'), nullable=False),
+    Column('gender', Enum(Gender, name='gender'), nullable=False),
+    Column('floor', SmallInteger, nullable=False),
+    Column('seat', SmallInteger, nullable=False)
 )

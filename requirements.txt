@@ -1,6 +1,8 @@
-aiohttp
-asyncpgsa
-alembic
-configargparse
-psycopg2-binary
-sqlalchemy
+aiohttp~=3.6.2
+asyncpgsa==0.26.1
+alembic~=1.4.2
+configargparse~=1.2.1
+psycopg2-binary==2.8.5
+
+# https://github.com/kvesteri/sqlalchemy-utils/issues/432
+sqlalchemy==1.3.13

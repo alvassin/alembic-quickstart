@@ -3,40 +3,48 @@ import uuid
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
 from sqlalchemy_utils import create_database, drop_database
 from yarl import URL
 
+from staff.utils import DEFAULT_PG_URL, alembic_config_from_url
 
-DB_URL = os.getenv('CI_STAFF_DB_URL',
-                   'postgresql://staff:hackme@0.0.0.0/staff')
+
+PG_URL = os.getenv('CI_STAFF_PG_URL', DEFAULT_PG_URL)
 
 
 @pytest.fixture
-def temp_db() -> str:
+def postgres():
     """
     Creates temporary database for each test and then drops it.
 
     If there are connected clients when test is finished -
     disconnects them before dropping table.
     """
-    tmp_db_name = '.'.join([uuid.uuid4().hex, 'pytest'])
-    tmp_db_url = str(URL(DB_URL).with_path(tmp_db_name))
-    create_database(tmp_db_url)
+    tmp_name = '.'.join([uuid.uuid4().hex, 'pytest'])
+    tmp_url = str(URL(PG_URL).with_path(tmp_name))
+    create_database(tmp_url)
 
     try:
-        yield tmp_db_url
+        yield tmp_url
     finally:
-        drop_database(tmp_db_url)
+        drop_database(tmp_url)
 
 
 @pytest.fixture()
-def temp_db_engine(temp_db) -> Engine:
+def postgres_engine(postgres):
     """
-    Engine, tied to temporary database.
+    Engine, bound to temporary database.
     """
-    engine = create_engine(temp_db, echo=True)
+    engine = create_engine(postgres, echo=True)
     try:
         yield engine
     finally:
         engine.dispose()
+
+
+@pytest.fixture()
+def alembic_config(postgres):
+    """
+    Alembic configuration object, bound to temporary database.
+    """
+    return alembic_config_from_url(postgres)
