@@ -1,9 +1,10 @@
-Examples how to test migrations & [Alembic](https://alembic.sqlalchemy.org/en/latest/) best practices.
+Examples how to test migrations & [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
+best practices ([Russian translation](README_ru.md)).
 
 Prepared for "Databases: models, migrations, testing" lection at 
-[Yandex Backend Development School](https://yandex.ru/promo/academy/backend-school/) and 
+[Yandex Backend Development school](https://yandex.ru/promo/academy/backend-school/) and 
 ["How to develop & test database migrations with Alembic"](https://www.youtube.com/watch?v=qrlTDNaUQ-Q&feature=youtu.be&t=5862) presentation at 
-[Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019).
+[Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian language).
 
 ## Stairway test
 Simple and efficient method to check that migration does not have typos and 
