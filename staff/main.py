@@ -1,4 +1,5 @@
 from functools import partial
+from http import HTTPStatus
 
 from aiohttp.web import Application, run_app
 from aiohttp.web_exceptions import HTTPBadRequest
@@ -33,7 +34,7 @@ async def init_pg(app, pg_url):
     try:
         yield
     finally:
-        app['pg'].pool.close()
+        await app['pg'].pool.close()
 
 
 async def handle_get_users(request):
@@ -59,9 +60,17 @@ async def handle_create_user(request):
             seat=data.get('seat')
         ).returning(users_table)
         row = await request.app['pg'].fetchrow(query)
-        return json_response(dict(row))
+        return json_response(dict(row), status=HTTPStatus.CREATED)
     except NotNullViolationError:
         raise HTTPBadRequest()
+
+
+def create_app(pg_url) -> Application:
+    app = Application()
+    app.cleanup_ctx.append(partial(init_pg, pg_url=str(pg_url)))
+    app.router.add_route('GET', '/users', handle_get_users)
+    app.router.add_route('POST', '/users', handle_create_user)
+    return app
 
 
 def main():
@@ -70,13 +79,7 @@ def main():
     Is called via command-line env/bin/staff-api, created by setup.py.
     """
     args = parser.parse_args()
-
-    app = Application()
-    app.router.add_route('GET', '/users', handle_get_users)
-    app.router.add_route('POST', '/users', handle_create_user)
-    app.cleanup_ctx.append(
-        partial(init_pg, pg_url=str(args.pg_url))
-    )
+    app = create_app(args.pg_url)
     run_app(app, host=args.host, port=args.port)
 
 

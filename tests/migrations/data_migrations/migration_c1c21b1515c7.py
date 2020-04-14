@@ -30,6 +30,8 @@ migration = load_migration_as_module('c1c21b1515c7_split_floor_and_seat.py')
 rev_base: str = migration.down_revision
 rev_head: str = migration.revision
 
+# We can reuse objects from migration.
+# users_table object with legacy & new columns would be very handy.
 users_table: Table = migration.users_table
 
 # Pytest call each test in separate process, so you could use global variables

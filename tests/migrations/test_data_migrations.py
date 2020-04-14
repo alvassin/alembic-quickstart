@@ -1,5 +1,6 @@
 """
 Check data is migrated correctly in "data" migrations.
+See data_migrations/migration_*.py for example.
 """
 from typing import Callable
 
@@ -7,15 +8,12 @@ import pytest
 from alembic.command import downgrade, upgrade
 
 from staff.utils import make_validation_params_groups
-from tests.data_migrations import migration_c1c21b1515c7
+from tests.migrations.data_migrations import migration_c1c21b1515c7
 
 
 def get_data_migrations():
     """
-    Returns tests for data migrations, see
-    tests/data_migrations/migration_*.py for example.
-
-    Add files from tests/data_migrations folder to this call:
+    Returns tests for data migrations, from tests/data_migrations folder.
     """
     return make_validation_params_groups(
         migration_c1c21b1515c7,
@@ -23,7 +21,7 @@ def get_data_migrations():
 
 
 @pytest.mark.parametrize(
-    ['rev_base', 'rev_head', 'on_init', 'on_upgrade', 'on_downgrade'],
+    ('rev_base', 'rev_head', 'on_init', 'on_upgrade', 'on_downgrade'),
     get_data_migrations()
 )
 def test_data_migrations(
