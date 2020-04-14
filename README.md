@@ -1,12 +1,41 @@
-Examples how to test migrations & [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
-best practices ([Russian translation](README_ru.md)).
+Migrations testing and [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
+usage examples.
 
 Prepared for "Databases: models, migrations, testing" lection at 
 [Yandex Backend Development school](https://yandex.ru/promo/academy/backend-school/) and 
 ["How to develop & test database migrations with Alembic"](https://youtu.be/qrlTDNaUQ-Q?t=5650) presentation at 
-[Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian language).
+[Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian). 
 
-## Stairway test
+[Russian translation](README_ru.md) is available for this document.
+
+
+## What's inside
+
+Aiohttp application with couple migrations and two commands: `staff-db` to control database state (Alembic wrapper) and `staff-api` (REST API aiohttp service).
+
+Execute `make devenv` command to prepare development environment. It will create virtual environment in `./env` folder and install all dependencies (execute `make` for all available commands).
+
+## How to control database state
+
+Alembic provides `alembic` command to control database state (apply, rollback migrations, etc). In some cases it has the following disadvantages:
+
+* `alembic` command requires `alembic.ini` configuration file, which is searched at current working directory. It is possible to specify path to `alembic.ini` using command-line argument `--config`, but it is easier to call the command from any folder without additional parameters.
+* To connect Alembic to specific database it is required to change `sqlalachemy.url` parameter in `alembic.ini`. Sometimes (e.g. if the application is distributed via Docker container) it is much more convenient to specify the database URL with an environment variable and/or a command-line argument.
+* Some applications need to extend standard Alembic arguments (e.g. to support working in different PostgreSQL schemas).
+
+They can be solved by using Alembic wrapper. For example, `staff-db` provides ability to specify database URL using environment variable `STAFF_PG_URL` or `--pg-url` argument, resolves the path to `alembic.ini` using its location, rather than the current working directory.
+
+## How to prepare database for tests
+
+Very often tests require the database. You can create separate database for each test using pytest fixture (see [postgres fixture](tests/migrations/conftest.py#L8)), this approach allows to isolate tests from each other.
+
+In most cases, tests require already prepared database with migrations applied. Since it is expensive to run migrations when creating a database for each test, you could do it once to prepare database, and then use it as template to create new databases.
+
+Template database is created using [`migrated_postgres_template`](tests/api/conftest.py#L10) fixture within `session` scope. Databases for tests are created using [`migrated_postgres`](tests/api/conftest.py#L24) fixture.
+
+## How to test migrations
+
+### Stairway test
 Simple and efficient method to check that migration does not have typos and 
 rolls back all schema changes. Does not require maintenance - you can add this test 
 to your project once and forget about it.
@@ -24,7 +53,7 @@ See [test_stairway.py](tests/migrations/test_stairway.py) for example.
 ![Stairway test](assets/stairway.png)
 
 
-## Data-migration test
+### Data-migration test
 Some migrations don't just add new columns or tables, but change the data in 
 some way.
 
