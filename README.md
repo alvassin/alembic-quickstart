@@ -50,8 +50,7 @@ Test retrieves all migrations list, and for each migration executes `upgrade`,
 `downgrade`, `upgrade` Alembic commands.
 See [test_stairway.py](tests/migrations/test_stairway.py) for example.
 
-![Stairway test](assets/stairway.png)
-
+<img src="assets/stairway.gif" width="800" height="277" alt="Stairway test">
 
 ### Data-migration test
 Some migrations don't just add new columns or tables, but change the data in 
