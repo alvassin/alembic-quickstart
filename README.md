@@ -3,7 +3,7 @@ best practices ([Russian translation](README_ru.md)).
 
 Prepared for "Databases: models, migrations, testing" lection at 
 [Yandex Backend Development school](https://yandex.ru/promo/academy/backend-school/) and 
-["How to develop & test database migrations with Alembic"](https://www.youtube.com/watch?v=qrlTDNaUQ-Q&feature=youtu.be&t=5862) presentation at 
+["How to develop & test database migrations with Alembic"](https://youtu.be/qrlTDNaUQ-Q?t=5650) presentation at 
 [Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian language).
 
 ## Stairway test
@@ -19,7 +19,7 @@ deleting table or column - developer has to do it manually.
 #### How it works
 Test retrieves all migrations list, and for each migration executes `upgrade`, 
 `downgrade`, `upgrade` Alembic commands.
-See [tests/test_stairway.py](tests/test_stairway.py) for example.
+See [test_stairway.py](tests/migrations/test_stairway.py) for example.
 
 ![Stairway test](assets/stairway.png)
 
@@ -43,4 +43,4 @@ the most serious consequences.
 The test applies all migrations up to the one being tested and adds a dataset to the database that will be modified by the migration being tested.
 Then test executes the `upgrade()` method and checks that the data was changed correctly. 
 After this, test calls `downgrade()` method and checks that all data was returned to its initial state.
-See [tests/test_data_migrations.py](tests/test_data_migrations.py) for example.
+See [test_data_migrations.py](tests/migrations/test_data_migrations.py) for example.
