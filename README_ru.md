@@ -1,4 +1,5 @@
-Примеры тестирования миграций и варинтов использования [Alembic](https://alembic.sqlalchemy.org/en/latest/) для лекции "Базы данных: модели, миграции, тестирование" 
+Примеры тестирования миграций и варинтов использования [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
+для лекции ["Базы данных: модели, миграции, тестирование"](https://habr.com/ru/company/yandex/blog/498856/#5) 
 в [Школе бэкенд-разработки](https://yandex.ru/promo/academy/backend-school/) Яндекса и 
 выступления ["Как писать и тестировать миграции БД с Alembic"](https://youtu.be/qrlTDNaUQ-Q?t=5650) 
 на митапе [Moscow Python №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019).

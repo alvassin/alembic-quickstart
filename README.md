@@ -1,7 +1,7 @@
 Migrations testing and [Alembic](https://alembic.sqlalchemy.org/en/latest/) 
 usage examples.
 
-Prepared for "Databases: models, migrations, testing" lection at 
+Prepared for ["Databases: models, migrations, testing"](https://habr.com/ru/company/yandex/blog/498856/#5) lection at 
 [Yandex Backend Development school](https://yandex.ru/promo/academy/backend-school/) and 
 ["How to develop & test database migrations with Alembic"](https://youtu.be/qrlTDNaUQ-Q?t=5650) presentation at 
 [Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian). 
