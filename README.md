@@ -6,8 +6,9 @@ Prepared for ["Databases: models, migrations, testing"](https://habr.com/ru/comp
 ["How to develop & test database migrations with Alembic"](https://youtu.be/qrlTDNaUQ-Q?t=5650) presentation at 
 [Moscow Python meetup №69](https://events.yandex.ru/events/moscow-python-meetup-30-10-2019) (videos are in Russian). 
 
-[🇷🇺 Russian translation](README_ru.md) is available for this document.
+Code & examples are updated from time to time, please browse files at [7b804f8371bc14bbc35991654a37fc90b7fe4358](https://github.com/alvassin/alembic-quickstart/tree/7b804f8371bc14bbc35991654a37fc90b7fe4358) commit if you need exact code shown at Moscow Python meetup.
 
+[🇷🇺 Russian translation](README_ru.md) is available for this document.
 
 ## What's inside
 
