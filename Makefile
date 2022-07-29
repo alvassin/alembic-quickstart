@@ -11,7 +11,7 @@ all:
 
 devenv:
 	rm -rf env
-	python -m venv env
+	python3.9 -m venv env
 	env/bin/pip install -Ue '.[dev]'
 
 clean:
